@@ -31,33 +31,33 @@ local height = 32
 
 function TotemDismiss:onLogin()
   local _, classFilename = UnitClass("player")
-  local nextAnchor
+  local prevButton
 
   if classFilename == "SHAMAN" then
     for _, totemId in ipairs(self.order) do
       local totemDef = self.totems[totemId]
-      nextAnchor = createButton(totemId, totemDef, nextAnchor, width, height)
+      prevButton = createButton(totemId, totemDef, prevButton)
     end
   end
 end
 
-function createButton(name, def, prevFrame, width, height)
-  local frame = CreateFrame("Button", "TotemDismissButton_"..name, UIParent, "SecureActionButtonTemplate")
+function createButton(name, def, prevButton)
+  local button = CreateFrame("Button", "TotemDismissButton_"..name, UIParent, "SecureActionButtonTemplate")
 
-  if prevFrame == nil then
-    frame:SetPoint("CENTER", mainframe, "CENTER", -1.5*width, 0)
+  if prevButton == nil then
+    button:SetPoint("CENTER", mainframe, "CENTER", -1.5*width, 0)
   else
-    frame:SetPoint("LEFT", prevFrame, "RIGHT")
+    button:SetPoint("LEFT", prevButton, "RIGHT")
   end
 
   -- TODO: set strata?
-  frame:SetWidth(width)
-  frame:SetHeight(height)
+  button:SetWidth(width)
+  button:SetHeight(height)
 
-  local ntex = frame:CreateTexture()
+  local ntex = button:CreateTexture()
   ntex:SetTexture(def.icon)
   ntex:SetAllPoints()
-  frame:SetNormalTexture(ntex)
+  button:SetNormalTexture(ntex)
 
 --  local htex = frame:CreateTexture()
 --  htex:SetTexture("Interface/Buttons/UI-Panel-Button-Highlight")
@@ -71,12 +71,12 @@ function createButton(name, def, prevFrame, width, height)
 --  ptex:SetAllPoints()
 --  frame:SetPushedTexture(ptex)
 
-  frame:SetAttribute("*type1", "destroytotem")
-  frame:SetAttribute("*totem-slot*", def.id)
+  button:SetAttribute("*type1", "destroytotem")
+  button:SetAttribute("*totem-slot*", def.id)
 
-  frame:Show()
+  button:Show()
 
-  return frame
+  return button
 end
 
 local frame = CreateFrame("Frame")
