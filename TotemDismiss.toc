@@ -1,3 +1,7 @@
 ## Interface: 11302
 ## Title: Totem Dismiss
+## Notes: Allows Shamans to dismiss their totems
 ## Author: nmonterroso
+## Version: 1.0.0
+
+main.lua
