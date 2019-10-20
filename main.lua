@@ -34,7 +34,7 @@ TotemDismiss = {
     },
     [air] = {
       id = 4,
-      icon = 'Interface/ICONS/INV_Feather_11',
+      icon = 'Interface/AddOns/TotemDismiss/air',
       button = nil,
       overlay = nil,
       iconTexture = nil,
@@ -48,6 +48,7 @@ TotemDismiss = {
 -- TODO: read from config?
 local width = 32
 local height = 32
+local fontSize = 10
 
 function TotemDismiss:onLogin()
   local _, classFilename = UnitClass("player")
@@ -154,6 +155,9 @@ function createCooldown(button)
   cooldown:SetDrawEdge(false)
   cooldown:SetPoint("TOPLEFT", 1, -1)
   cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+
+  local text = cooldown:GetRegions()
+
 
   return cooldown
 end
