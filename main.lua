@@ -34,7 +34,7 @@ TotemDismiss = {
     },
     [air] = {
       id = 4,
-      icon = 'Interface/ICONS/Spell_Nature_EarthBind',
+      icon = 'Interface/ICONS/INV_Feather_11',
       button = nil,
       overlay = nil,
       iconTexture = nil,
