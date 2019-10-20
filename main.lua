@@ -43,6 +43,8 @@ end
 
 function createButton(name, def, prevButton)
   local button = CreateFrame("Button", "TotemDismissButton_"..name, UIParent, "SecureActionButtonTemplate")
+  button.overlay = button:CreateTexture(nil, "OVERLAY")
+  button.overlay:SetAllPoints()
 
   if prevButton == nil then
     button:SetPoint("CENTER", mainframe, "CENTER", -1.5*width, 0)
@@ -59,24 +61,23 @@ function createButton(name, def, prevButton)
   ntex:SetAllPoints()
   button:SetNormalTexture(ntex)
 
---  local htex = frame:CreateTexture()
---  htex:SetTexture("Interface/Buttons/UI-Panel-Button-Highlight")
---  htex:SetTexCoord(0, 0.625, 0, 0.6875)
---  htex:SetAllPoints()
---  frame:SetHighlightTexture(htex)
---
---  local ptex = frame:CreateTexture()
---  ptex:SetTexture("Interface/Buttons/UI-Panel-Button-Down")
---  ptex:SetTexCoord(0, 0.625, 0, 0.6875)
---  ptex:SetAllPoints()
---  frame:SetPushedTexture(ptex)
-
   button:SetAttribute("*type1", "destroytotem")
   button:SetAttribute("*totem-slot*", def.id)
 
   button:Show()
 
+  disableButton(button)
   return button
+end
+
+function disableButton(button)
+  button:Disable()
+  button.overlay:SetColorTexture(0, 0, 0, .65)
+end
+
+function enableButton(button)
+  button:Enable()
+  --button:SetAlpha(1.0)
 end
 
 local frame = CreateFrame("Frame")
