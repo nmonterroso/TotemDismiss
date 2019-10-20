@@ -11,6 +11,7 @@ TotemDismiss = {
       button = nil,
       overlay = nil,
       iconTexture = nil,
+      cooldown = nil,
       isReady = false,
     },
     [earth] = {
@@ -19,6 +20,7 @@ TotemDismiss = {
       button = nil,
       overlay = nil,
       iconTexture = nil,
+      cooldown = nil,
       isReady = false,
     },
     [water] = {
@@ -27,6 +29,7 @@ TotemDismiss = {
       button = nil,
       overlay = nil,
       iconTexture = nil,
+      cooldown = nil,
       isReady = false,
     },
     [air] = {
@@ -35,6 +38,7 @@ TotemDismiss = {
       button = nil,
       overlay = nil,
       iconTexture = nil,
+      cooldown = nil,
       isReady = false,
     }
   },
@@ -67,10 +71,16 @@ end
 
 function TotemDismiss:onTotemUpdate(id)
   local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(id)
+  local totem = self:getTotem(id)
+  if totem == nil then
+    return
+  end
+
   if haveTotem and startTime > 0 then
     self:enable(id)
     self:setTexture(id, icon)
-    print('set down '..totemName..', start '..startTime..', duration '..duration..', icon '..icon)
+    local timeLeft = GetTotemTimeLeft(id)
+    totem.cooldown:SetCooldown(startTime, duration)
   else
     self:disable(id)
     self:setTexture(id)
@@ -81,6 +91,7 @@ function TotemDismiss:initTotem(type, anchor, id, icon)
   local button = createButton(type, anchor, id)
   local iconTexture = createIconTexture(button)
   local overlay = createOverlay(button)
+  local cooldown = createCooldown(button)
 
   button:SetNormalTexture(iconTexture)
   button:Show()
@@ -88,6 +99,7 @@ function TotemDismiss:initTotem(type, anchor, id, icon)
   self.totems[type].button = button
   self.totems[type].overlay = overlay
   self.totems[type].iconTexture = iconTexture
+  self.totems[type].cooldown = cooldown
   self.totems[type].isReady = true
 
   self:setTexture(id)
@@ -124,6 +136,7 @@ function TotemDismiss:disable(id)
   if totem.isReady then
     totem.button:Disable()
     totem.overlay:Show()
+    totem.cooldown:Clear()
   end
 end
 
@@ -133,6 +146,15 @@ function TotemDismiss:enable(id)
     totem.button:Enable()
     totem.overlay:Hide()
   end
+end
+
+function createCooldown(button)
+  local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
+  cooldown:SetReverse(true)
+  cooldown:SetDrawEdge(false)
+  cooldown:SetAllPoints()
+
+  return cooldown
 end
 
 function createButton(type, anchor, id)
