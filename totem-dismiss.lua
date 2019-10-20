@@ -3,9 +3,22 @@ local earth = 'earth'
 local water = 'water'
 local air = 'air'
 
-TotemDismiss = {
-  config = nil,
-  totems = {
+TotemDismiss = LibStub("AceAddon-3.0"):NewAddon(
+    "TotemDismiss",
+    "AceConsole-3.0",
+    "AceEvent-3.0"
+    --"AceDB-3.0",
+    --"AceConfig-3.0"
+)
+
+function TotemDismiss:OnInitialize()
+  if not self:canUse() then
+    return
+  end
+
+  self.db = LibStub("AceDB-3.0"):New("TotemDismissDB")
+  self.totemOrder = {earth, fire, water, air}
+  self.totems = {
     [fire] = {
       id = 1,
       icon = 'Interface/ICONS/Spell_Fire_Fire',
@@ -41,31 +54,19 @@ TotemDismiss = {
       iconTexture = nil,
       cooldown = nil,
       isReady = false,
-    }
-  },
-  order = {earth, fire, water, air},
-}
+    },
+  }
+end
 
-function TotemDismiss:onLogin()
-  local _, classFilename = UnitClass("player")
-  local anchor
-
-  if classFilename == "SHAMAN" then
-    self.config = TotemDismissConfig:LoadVariables()
-
-    for _, type in ipairs(self.order) do
-      local def = self.totems[type]
-
-      if not self.totems[type].isReady then
-        self:initTotem(type, anchor, def.id)
-      end
-
-      local totem = self:getTotem(def.id)
-      if totem.isReady then
-        anchor = totem.button
-      end
-    end
+function TotemDismiss:OnEnable()
+  if not self:canUse() then
+    return
   end
+
+  self:initTotems()
+  self:RegisterEvent("PLAYER_TOTEM_UPDATE", function(event, id)
+    self:onTotemUpdate(id)
+  end)
 end
 
 function TotemDismiss:onTotemUpdate(id)
@@ -85,11 +86,26 @@ function TotemDismiss:onTotemUpdate(id)
   end
 end
 
-function TotemDismiss:initTotem(type, anchor, id)
-  local button = self:createButton(type, anchor, id)
-  local iconTexture = createIconTexture(button)
-  local overlay = createOverlay(button)
-  local cooldown = createCooldown(button)
+function TotemDismiss:initTotems()
+  local lastAnchor
+  for _, type in ipairs(self.totemOrder) do
+    local totem = self.totems[type]
+
+    if not self.totems[type].isReady then
+      self:initTotem(totem.id, type, lastAnchor)
+    end
+
+    if totem.isReady then
+      lastAnchor = totem.button
+    end
+  end
+end
+
+function TotemDismiss:initTotem(id, type, anchor)
+  local button = self:createButton(id, type, anchor)
+  local iconTexture = self:createIconTexture(button)
+  local overlay = self:createOverlay(button)
+  local cooldown = self:createCooldown(button)
 
   button:SetNormalTexture(iconTexture)
   button:Show()
@@ -146,25 +162,25 @@ function TotemDismiss:enable(id)
   end
 end
 
-function TotemDismiss:createButton(type, anchor, id)
+function TotemDismiss:createButton(id, type, anchor)
   local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
 
   if anchor == nil then
-    button:SetPoint(TotemDismissConfig:GetInitialButtonPoint())
+    button:SetPoint("LEFT", mainFrame, "CENTER", -64, 0)
   else
-    button:SetPoint(TotemDismissConfig:GetButtonPoint(anchor))
+    button:SetPoint("LEFT", anchor, "RIGHT")
   end
 
   -- TODO: set strata?
-  button:SetWidth(self.config.buttonWidth)
-  button:SetHeight(self.config.buttonHeight)
+  button:SetWidth(32)
+  button:SetHeight(32)
   button:SetAttribute("*type1", "destroytotem")
   button:SetAttribute("*totem-slot*", id)
 
   return button
 end
 
-function createCooldown(button)
+function TotemDismiss:createCooldown(button)
   local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
   cooldown:SetReverse(true)
   cooldown:SetDrawEdge(false)
@@ -174,14 +190,14 @@ function createCooldown(button)
   return cooldown
 end
 
-function createIconTexture(button)
+function TotemDismiss:createIconTexture(button)
   local texture = button:CreateTexture()
   texture:SetAllPoints()
 
   return texture
 end
 
-function createOverlay(button)
+function TotemDismiss:createOverlay(button)
   local overlay = button:CreateTexture(nil, "OVERLAY")
   overlay:SetPoint("TOPLEFT", 1, -1)
   overlay:SetPoint("BOTTOMRIGHT", -1, 1)
@@ -191,15 +207,7 @@ function createOverlay(button)
   return overlay
 end
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:RegisterEvent("PLAYER_TOTEM_UPDATE")
-frame:SetScript("OnEvent", function(self, event, ...)
-  if event == "PLAYER_LOGIN" then
-    TotemDismiss:onLogin()
-    self:UnregisterEvent("PLAYER_LOGIN")
-  elseif event == "PLAYER_TOTEM_UPDATE" then
-    local totemId = select(1, ...)
-    TotemDismiss:onTotemUpdate(totemId)
-  end
-end)
+function TotemDismiss:canUse()
+  local _, classFilename = UnitClass("player")
+  return classFilename == "SHAMAN"
+end
