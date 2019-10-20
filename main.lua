@@ -72,7 +72,7 @@ end
 function TotemDismiss:onTotemUpdate(id)
   local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(id)
   local totem = self:getTotem(id)
-  if totem == nil then
+  if not totem.isReady then
     return
   end
 
@@ -152,7 +152,8 @@ function createCooldown(button)
   local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
   cooldown:SetReverse(true)
   cooldown:SetDrawEdge(false)
-  cooldown:SetAllPoints()
+  cooldown:SetPoint("TOPLEFT", 1, -1)
+  cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
 
   return cooldown
 end
