@@ -49,9 +49,9 @@ function TotemDismiss:onLogin()
         self:initTotem(type, anchor, def.id, def.icon)
       end
 
-      local totem = self:getTotemFromId(def.id)
-      if totem ~= nil then
-        anchor = totem.button
+      local button = self:getFramesFromId(def.id)
+      if button ~= nil then
+        anchor = button
       end
     end
   end
@@ -67,33 +67,44 @@ function TotemDismiss:initTotem(type, anchor, id, icon)
   self:disable(id)
 end
 
-function TotemDismiss:getTotemFromId(id)
+function TotemDismiss:getFramesFromId(id)
+  local ref
   if id == 1 then
-    return self.totems[fire]
+    ref = self.totems[fire]
   elseif id == 2 then
-    return self.totems[earth]
+    ref = self.totems[earth]
   elseif id == 3 then
-    return self.totems[water]
+    ref = self.totems[water]
   elseif id == 4 then
-    return self.totems[air]
+    ref = self.totems[air]
   end
 
-  return nil
+  if ref ~= nil then
+    return ref.button, ref.overlay
+  end
+
+  return nil, nil
 end
 
 function TotemDismiss:disable(id)
-  local totem = self:getTotemFromId(id)
-  if totem ~= nil then
-    totem.button:Disable()
-    totem.overlay:Show()
+  local button, overlay = self:getFramesFromId(id)
+  if button ~= nil then
+    button:Disable()
+  end
+
+  if overlay ~= nil then
+    overlay:Show()
   end
 end
 
 function TotemDismiss:enable(id)
-  local totem = self:getTotemFromId(id)
-  if totem ~= nil then
-    totem.button:Enable()
-    totem.overlay:Hide()
+  local button, overlay = self:getFramesFromId(id)
+  if button ~= nil then
+    button:Enable()
+  end
+
+  if overlay ~= nil then
+    overlay:Hide()
   end
 end
 
