@@ -2,6 +2,8 @@
 ## Title: Totem Dismiss
 ## Notes: Allows Shamans to dismiss their totems
 ## Author: nmonterroso
+## SavedVariables: TotemDismissVariables
 ## Version: 1.0.0
 
 main.lua
+config.lua

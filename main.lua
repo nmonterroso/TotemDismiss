@@ -4,6 +4,7 @@ local water = 'water'
 local air = 'air'
 
 TotemDismiss = {
+  config = nil,
   totems = {
     [fire] = {
       id = 1,
@@ -45,20 +46,18 @@ TotemDismiss = {
   order = {earth, fire, water, air},
 }
 
--- TODO: read from config?
-local width = 32
-local height = 32
-
 function TotemDismiss:onLogin()
   local _, classFilename = UnitClass("player")
   local anchor
 
   if classFilename == "SHAMAN" then
+    self.config = TotemDismissConfig:LoadVariables()
+
     for _, type in ipairs(self.order) do
       local def = self.totems[type]
 
-      if self.totems[type].button == nil then
-        self:initTotem(type, anchor, def.id, def.icon)
+      if not self.totems[type].isReady then
+        self:initTotem(type, anchor, def.id)
       end
 
       local totem = self:getTotem(def.id)
@@ -79,7 +78,6 @@ function TotemDismiss:onTotemUpdate(id)
   if haveTotem and startTime > 0 then
     self:enable(id)
     self:setTexture(id, icon)
-    local timeLeft = GetTotemTimeLeft(id)
     totem.cooldown:SetCooldown(startTime, duration)
   else
     self:disable(id)
@@ -87,8 +85,8 @@ function TotemDismiss:onTotemUpdate(id)
   end
 end
 
-function TotemDismiss:initTotem(type, anchor, id, icon)
-  local button = createButton(type, anchor, id)
+function TotemDismiss:initTotem(type, anchor, id)
+  local button = self:createButton(type, anchor, id)
   local iconTexture = createIconTexture(button)
   local overlay = createOverlay(button)
   local cooldown = createCooldown(button)
@@ -148,6 +146,24 @@ function TotemDismiss:enable(id)
   end
 end
 
+function TotemDismiss:createButton(type, anchor, id)
+  local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
+
+  if anchor == nil then
+    button:SetPoint(TotemDismissConfig:GetInitialButtonPoint())
+  else
+    button:SetPoint(TotemDismissConfig:GetButtonPoint(anchor))
+  end
+
+  -- TODO: set strata?
+  button:SetWidth(self.config.buttonWidth)
+  button:SetHeight(self.config.buttonHeight)
+  button:SetAttribute("*type1", "destroytotem")
+  button:SetAttribute("*totem-slot*", id)
+
+  return button
+end
+
 function createCooldown(button)
   local cooldown = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
   cooldown:SetReverse(true)
@@ -156,24 +172,6 @@ function createCooldown(button)
   cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
 
   return cooldown
-end
-
-function createButton(type, anchor, id)
-  local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
-
-  if anchor == nil then
-    button:SetPoint("LEFT", mainframe, "CENTER", -2*width, 0)
-  else
-    button:SetPoint("LEFT", anchor, "RIGHT")
-  end
-
-  -- TODO: set strata?
-  button:SetWidth(width)
-  button:SetHeight(height)
-  button:SetAttribute("*type1", "destroytotem")
-  button:SetAttribute("*totem-slot*", id)
-
-  return button
 end
 
 function createIconTexture(button)
