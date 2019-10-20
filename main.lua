@@ -8,18 +8,26 @@ TotemDismiss = {
     [fire] = {
       id = 1,
       icon = 'Interface/ICONS/Spell_Fire_Fire',
+      button = nil,
+      overlay = nil,
     },
     [earth] = {
       id = 2,
-      icon = 'Interface/ICONS/INV_Ore_Iron_01',
+      icon = 'Interface/ICONS/INV_Stone_16',
+      button = nil,
+      overlay = nil,
     },
     [water] = {
       id = 3,
       icon = 'Interface/ICONS/INV_Stone_02',
+      button = nil,
+      overlay = nil,
     },
     [air] = {
       id = 4,
       icon = 'Interface/ICONS/Spell_Nature_EarthBind',
+      button = nil,
+      overlay = nil,
     }
   },
   order = {earth, fire, water, air},
@@ -31,25 +39,71 @@ local height = 32
 
 function TotemDismiss:onLogin()
   local _, classFilename = UnitClass("player")
-  local prevButton
+  local anchor
 
   if classFilename == "SHAMAN" then
-    for _, totemId in ipairs(self.order) do
-      local totemDef = self.totems[totemId]
-      prevButton = createButton(totemId, totemDef, prevButton)
+    for _, type in ipairs(self.order) do
+      local def = self.totems[type]
+
+      if self.totems[type].button == nil then
+        self:initTotem(type, anchor, def.id, def.icon)
+      end
+
+      local totem = self:getTotemFromId(def.id)
+      if totem ~= nil then
+        anchor = totem.button
+      end
     end
   end
 end
 
-function createButton(name, def, prevButton)
-  local button = CreateFrame("Button", "TotemDismissButton_"..name, UIParent, "SecureActionButtonTemplate")
-  button.overlay = button:CreateTexture(nil, "OVERLAY")
-  button.overlay:SetAllPoints()
+function TotemDismiss:initTotem(type, anchor, id, icon)
+  local button = createButton(type, anchor, id, icon)
+  local overlay = createOverlay(button)
 
-  if prevButton == nil then
+  self.totems[type].button = button
+  self.totems[type].overlay = overlay
+
+  self:disable(id)
+end
+
+function TotemDismiss:getTotemFromId(id)
+  if id == 1 then
+    return self.totems[fire]
+  elseif id == 2 then
+    return self.totems[earth]
+  elseif id == 3 then
+    return self.totems[water]
+  elseif id == 4 then
+    return self.totems[air]
+  end
+
+  return nil
+end
+
+function TotemDismiss:disable(id)
+  local totem = self:getTotemFromId(id)
+  if totem ~= nil then
+    totem.button:Disable()
+    totem.overlay:Show()
+  end
+end
+
+function TotemDismiss:enable(id)
+  local totem = self:getTotemFromId(id)
+  if totem ~= nil then
+    totem.button:Enable()
+    totem.overlay:Hide()
+  end
+end
+
+function createButton(type, anchor, id, icon)
+  local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
+
+  if anchor == nil then
     button:SetPoint("CENTER", mainframe, "CENTER", -1.5*width, 0)
   else
-    button:SetPoint("LEFT", prevButton, "RIGHT")
+    button:SetPoint("LEFT", anchor, "RIGHT")
   end
 
   -- TODO: set strata?
@@ -57,34 +111,37 @@ function createButton(name, def, prevButton)
   button:SetHeight(height)
 
   local ntex = button:CreateTexture()
-  ntex:SetTexture(def.icon)
+  ntex:SetTexture(icon)
   ntex:SetAllPoints()
   button:SetNormalTexture(ntex)
 
   button:SetAttribute("*type1", "destroytotem")
-  button:SetAttribute("*totem-slot*", def.id)
+  button:SetAttribute("*totem-slot*", id)
 
   button:Show()
 
-  disableButton(button)
   return button
 end
 
-function disableButton(button)
-  button:Disable()
-  button.overlay:SetColorTexture(0, 0, 0, .65)
-end
+function createOverlay(button)
+  local overlay = button:CreateTexture(nil, "OVERLAY")
+  overlay:SetPoint("TOPLEFT", 1, -1)
+  overlay:SetPoint("BOTTOMRIGHT", -1, 1)
+  overlay:SetColorTexture(0, 0, 0, .65)
+  overlay:Show()
 
-function enableButton(button)
-  button:Enable()
-  --button:SetAlpha(1.0)
+  return overlay
 end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function(self, event, addon)
+frame:RegisterEvent("PLAYER_TOTEM_UPDATE")
+frame:SetScript("OnEvent", function(self, event, ...)
   if event == "PLAYER_LOGIN" then
     TotemDismiss:onLogin()
     self:UnregisterEvent("PLAYER_LOGIN")
+  elseif event == "PLAYER_TOTEM_UPDATE" then
+    local totemId = select(1, ...)
+    TotemDismiss:enable(totemId)
   end
 end)
