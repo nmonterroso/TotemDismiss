@@ -3,20 +3,15 @@ local earth = 'earth'
 local water = 'water'
 local air = 'air'
 
-TotemDismiss = LibStub("AceAddon-3.0"):NewAddon(
-    "TotemDismiss",
-    "AceConsole-3.0",
-    "AceEvent-3.0"
-    --"AceDB-3.0",
-    --"AceConfig-3.0"
-)
+TotemDismiss = LibStub("AceAddon-3.0"):NewAddon("TotemDismiss", "AceConsole-3.0", "AceEvent-3.0")
 
 function TotemDismiss:OnInitialize()
   if not self:canUse() then
     return
   end
 
-  self.db = LibStub("AceDB-3.0"):New("TotemDismissDB")
+  self.db = LibStub("AceDB-3.0"):New("TotemDismissDB", TotemDismissDefaultVariables)
+  self.config = nil
   self.totemOrder = {earth, fire, water, air}
   self.totems = {
     [fire] = {
@@ -63,6 +58,8 @@ function TotemDismiss:OnEnable()
     return
   end
 
+  self.config = self.db.global
+  self.configHelper = TotemDismissConfigHelper:init(self.config)
   self:initTotems()
   self:RegisterEvent("PLAYER_TOTEM_UPDATE", function(event, id)
     self:onTotemUpdate(id)
@@ -166,14 +163,14 @@ function TotemDismiss:createButton(id, type, anchor)
   local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
 
   if anchor == nil then
-    button:SetPoint("LEFT", mainFrame, "CENTER", -64, 0)
+    button:SetPoint(self.configHelper:GetInitialButtonPoint())
   else
-    button:SetPoint("LEFT", anchor, "RIGHT")
+    button:SetPoint(self.configHelper:GetButtonPoint(anchor))
   end
 
   -- TODO: set strata?
-  button:SetWidth(32)
-  button:SetHeight(32)
+  button:SetWidth(self.config.buttonWidth)
+  button:SetHeight(self.config.buttonHeight)
   button:SetAttribute("*type1", "destroytotem")
   button:SetAttribute("*totem-slot*", id)
 

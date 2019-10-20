@@ -2,7 +2,7 @@
 ## Title: Totem Dismiss
 ## Notes: Allows Shamans to dismiss their totems
 ## Author: nmonterroso
-## SavedVariables: TotemDismissVariables
+## SavedVariables: TotemDismissDB
 ## Version: 1.0.0
 
 externals.xml
