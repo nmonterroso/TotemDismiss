@@ -57,6 +57,16 @@ function TotemDismiss:onLogin()
   end
 end
 
+function TotemDismiss:onTotemUpdate(id)
+  _, _, _, duration, icon = GetTotemInfo(id)
+  if duration == 0 then
+    self:disable(id)
+    return
+  end
+
+  self:enable(id)
+end
+
 function TotemDismiss:initTotem(type, anchor, id, icon)
   local button = createButton(type, anchor, id, icon)
   local overlay = createOverlay(button)
@@ -153,6 +163,6 @@ frame:SetScript("OnEvent", function(self, event, ...)
     self:UnregisterEvent("PLAYER_LOGIN")
   elseif event == "PLAYER_TOTEM_UPDATE" then
     local totemId = select(1, ...)
-    TotemDismiss:enable(totemId)
+    TotemDismiss:onTotemUpdate(totemId)
   end
 end)
