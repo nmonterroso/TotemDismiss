@@ -10,24 +10,32 @@ TotemDismiss = {
       icon = 'Interface/ICONS/Spell_Fire_Fire',
       button = nil,
       overlay = nil,
+      iconTexture = nil,
+      isReady = false,
     },
     [earth] = {
       id = 2,
       icon = 'Interface/ICONS/INV_Stone_16',
       button = nil,
       overlay = nil,
+      iconTexture = nil,
+      isReady = false,
     },
     [water] = {
       id = 3,
       icon = 'Interface/ICONS/INV_Stone_02',
       button = nil,
       overlay = nil,
+      iconTexture = nil,
+      isReady = false,
     },
     [air] = {
       id = 4,
       icon = 'Interface/ICONS/Spell_Nature_EarthBind',
       button = nil,
       overlay = nil,
+      iconTexture = nil,
+      isReady = false,
     }
   },
   order = {earth, fire, water, air},
@@ -49,80 +57,89 @@ function TotemDismiss:onLogin()
         self:initTotem(type, anchor, def.id, def.icon)
       end
 
-      local button = self:getFramesFromId(def.id)
-      if button ~= nil then
-        anchor = button
+      local totem = self:getTotem(def.id)
+      if totem.isReady then
+        anchor = totem.button
       end
     end
   end
 end
 
 function TotemDismiss:onTotemUpdate(id)
-  _, _, _, duration, icon = GetTotemInfo(id)
-  if duration == 0 then
+  local haveTotem, totemName, startTime, duration, icon = GetTotemInfo(id)
+  if haveTotem and startTime > 0 then
+    self:enable(id)
+    self:setTexture(id, icon)
+    print('set down '..totemName..', start '..startTime..', duration '..duration..', icon '..icon)
+  else
     self:disable(id)
-    return
+    self:setTexture(id)
   end
-
-  self:enable(id)
 end
 
 function TotemDismiss:initTotem(type, anchor, id, icon)
-  local button = createButton(type, anchor, id, icon)
+  local button = createButton(type, anchor, id)
+  local iconTexture = createIconTexture(button)
   local overlay = createOverlay(button)
+
+  button:SetNormalTexture(iconTexture)
+  button:Show()
 
   self.totems[type].button = button
   self.totems[type].overlay = overlay
+  self.totems[type].iconTexture = iconTexture
+  self.totems[type].isReady = true
 
+  self:setTexture(id)
   self:disable(id)
 end
 
-function TotemDismiss:getFramesFromId(id)
-  local ref
+function TotemDismiss:setTexture(id, icon)
+  local totem = self:getTotem(id)
+  if not totem.isReady then
+    return
+  end
+
+  if icon == nil then
+    icon = totem.icon
+  end
+
+  totem.iconTexture:SetTexture(icon)
+end
+
+function TotemDismiss:getTotem(id)
   if id == 1 then
-    ref = self.totems[fire]
+    return self.totems[fire]
   elseif id == 2 then
-    ref = self.totems[earth]
+    return self.totems[earth]
   elseif id == 3 then
-    ref = self.totems[water]
-  elseif id == 4 then
-    ref = self.totems[air]
+    return self.totems[water]
   end
 
-  if ref ~= nil then
-    return ref.button, ref.overlay
-  end
-
-  return nil, nil
+  return self.totems[air]
 end
 
 function TotemDismiss:disable(id)
-  local button, overlay = self:getFramesFromId(id)
-  if button ~= nil then
-    button:Disable()
-  end
-
-  if overlay ~= nil then
-    overlay:Show()
+  local totem = self:getTotem(id)
+  if totem.isReady then
+    totem.button:Disable()
+    totem.overlay:Show()
   end
 end
 
 function TotemDismiss:enable(id)
-  local button, overlay = self:getFramesFromId(id)
-  if button ~= nil then
-    button:Enable()
-  end
-
-  if overlay ~= nil then
-    overlay:Hide()
+  local totem = self:getTotem(id)
+  if totem.isReady then
+    totem.button:Enable()
+    totem.overlay:Hide()
   end
 end
 
-function createButton(type, anchor, id, icon)
+function createButton(type, anchor, id)
   local button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
 
   if anchor == nil then
-    button:SetPoint("CENTER", mainframe, "CENTER", -1.5*width, 0)
+    button:SetPoint("LEFT", mainframe, "CENTER", -2*width, 0)
   else
     button:SetPoint("LEFT", anchor, "RIGHT")
   end
@@ -130,25 +147,24 @@ function createButton(type, anchor, id, icon)
   -- TODO: set strata?
   button:SetWidth(width)
   button:SetHeight(height)
-
-  local ntex = button:CreateTexture()
-  ntex:SetTexture(icon)
-  ntex:SetAllPoints()
-  button:SetNormalTexture(ntex)
-
   button:SetAttribute("*type1", "destroytotem")
   button:SetAttribute("*totem-slot*", id)
 
-  button:Show()
-
   return button
+end
+
+function createIconTexture(button)
+  local texture = button:CreateTexture()
+  texture:SetAllPoints()
+
+  return texture
 end
 
 function createOverlay(button)
   local overlay = button:CreateTexture(nil, "OVERLAY")
   overlay:SetPoint("TOPLEFT", 1, -1)
   overlay:SetPoint("BOTTOMRIGHT", -1, 1)
-  overlay:SetColorTexture(0, 0, 0, .65)
+  overlay:SetColorTexture(0, 0, 0, .55)
   overlay:Show()
 
   return overlay
