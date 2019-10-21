@@ -8,3 +8,4 @@
 externals.xml
 main.lua
 config.lua
+options.lua
