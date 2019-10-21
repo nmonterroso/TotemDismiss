@@ -4,11 +4,8 @@ TotemDismissDefaultVariables = {
     buttonHeight = 32,
     locked = true,
     scale = 1.0,
-    padding = 0,
+    margin = 0,
     anchor = {
-      point = "LEFT",
-      relativeTo = nil,
-      relativePoint = "CENTER",
       offsetX = nil,
       offsetY = nil,
     },
@@ -24,8 +21,7 @@ function TotemDismissConfigHelper:init(config)
   return self
 end
 
-function TotemDismissConfigHelper:GetInitialButtonPoint()
-  local relativeTo = self.config.anchor.relativeTo or mainFrame
+function TotemDismissConfigHelper:GetContainerPoint()
   local offsetX = -2*self.config.buttonWidth
   if self.config.anchor.offsetX ~= nil then
     offsetX = self.config.anchor.offsetX
@@ -35,9 +31,25 @@ function TotemDismissConfigHelper:GetInitialButtonPoint()
     offsetY = self.config.anchor.offsetY
   end
 
-  return self.config.anchor.point, relativeTo, self.config.anchor.relativePoint, offsetX, offsetY
+  return "LEFT", mainFrame, "CENTER", offsetX, offsetY
+end
+
+function TotemDismissConfigHelper:GetInitialButtonPoint()
+  return "LEFT", TotemDismiss.container, "LEFT"
 end
 
 function TotemDismissConfigHelper:GetButtonPoint(anchor)
-  return "LEFT", anchor, "RIGHT", self.config.padding
+  return "LEFT", anchor, "RIGHT", self.config.margin
+end
+
+function TotemDismissConfigHelper:GetHeight()
+  return self.config.buttonHeight*self.config.scale
+end
+
+function TotemDismissConfigHelper:GetWidth()
+  return self.config.buttonWidth*self.config.scale
+end
+
+function TotemDismissConfigHelper:GetTotalWidth()
+  return self:GetWidth()*4 + self.config.margin*3
 end

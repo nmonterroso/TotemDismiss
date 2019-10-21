@@ -14,6 +14,7 @@ function TotemDismiss:OnInitialize()
   self.config = nil
   self.optionFrame = TotemDismissOptions:setup()
   self.totemOrder = {earth, fire, water, air}
+  self.container = nil
   self.totems = {
     [fire] = {
       id = 1,
@@ -61,10 +62,15 @@ function TotemDismiss:OnEnable()
 
   self.config = self.db.global
   self.configHelper = TotemDismissConfigHelper:init(self.config)
-  self:initTotems()
+  self:Draw()
   self:RegisterEvent("PLAYER_TOTEM_UPDATE", function(event, id)
     self:onTotemUpdate(id)
   end)
+end
+
+function TotemDismiss:Draw()
+  self.container = self:createContainer()
+  self:createTotems()
 end
 
 function TotemDismiss:onTotemUpdate(id)
@@ -84,7 +90,7 @@ function TotemDismiss:onTotemUpdate(id)
   end
 end
 
-function TotemDismiss:initTotems()
+function TotemDismiss:createTotems()
   local lastAnchor
   for _, type in ipairs(self.totemOrder) do
     local totem = self.totems[type]
@@ -158,6 +164,31 @@ function TotemDismiss:enable(id)
   end
 end
 
+function TotemDismiss:unlock()
+  if self.container == nil then
+    return
+  end
+end
+
+function TotemDismiss:createContainer()
+  local container = self.container
+  if self.container == nil then
+    container = CreateFrame("Frame", nil, mainFrame)
+  end
+
+  container:SetFrameStrata("MEDIUM")
+  container:SetMovable(true)
+  container:EnableMouse(false)
+  container:RegisterForDrag("LeftButton")
+  container:SetClampedToScreen(true)
+  container:SetPoint(self.configHelper:GetContainerPoint())
+  container:SetHeight(self.configHelper:GetHeight())
+  container:SetWidth(self.configHelper:GetTotalWidth())
+  container:Show()
+
+  return container
+end
+
 function TotemDismiss:createButton(id, type, anchor)
   local totem = self:getTotem(id)
   local button
@@ -173,9 +204,8 @@ function TotemDismiss:createButton(id, type, anchor)
     button:SetPoint(self.configHelper:GetButtonPoint(anchor))
   end
 
-  -- TODO: set strata?
-  button:SetWidth(self.config.buttonWidth*self.config.scale)
-  button:SetHeight(self.config.buttonHeight*self.config.scale)
+  button:SetWidth(self.configHelper:GetWidth())
+  button:SetHeight(self.configHelper:GetHeight())
   button:SetAttribute("*type1", "destroytotem")
   button:SetAttribute("*totem-slot*", id)
 
