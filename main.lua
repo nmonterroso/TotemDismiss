@@ -66,6 +66,9 @@ function TotemDismiss:OnEnable()
   self:RegisterEvent("PLAYER_TOTEM_UPDATE", function(event, id)
     self:onTotemUpdate(id)
   end)
+  self:RegisterEvent("PLAYER_LOGOUT", function()
+    self.config.locked = true
+  end)
 end
 
 function TotemDismiss:Draw()
