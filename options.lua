@@ -8,7 +8,11 @@ local options = {
       type = "toggle",
       set = function(info, val)
         TotemDismiss.config.locked = val
-        TotemDismiss:Draw()
+        if val then
+          TotemDismiss:Lock()
+        else
+          TotemDismiss:Unlock()
+        end
       end,
       get = function(info) return TotemDismiss.config.locked end
     },

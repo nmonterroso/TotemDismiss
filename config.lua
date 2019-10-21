@@ -6,6 +6,8 @@ TotemDismissDefaultVariables = {
     scale = 1.0,
     margin = 0,
     anchor = {
+      point = "LEFT",
+      relativePoint = "CENTER",
       offsetX = nil,
       offsetY = nil,
     },
@@ -26,12 +28,13 @@ function TotemDismissConfigHelper:GetContainerPoint()
   if self.config.anchor.offsetX ~= nil then
     offsetX = self.config.anchor.offsetX
   end
+
   local offsetY = 0
   if self.config.anchor.offsetY ~= nil then
     offsetY = self.config.anchor.offsetY
   end
 
-  return "LEFT", mainFrame, "CENTER", offsetX, offsetY
+  return self.config.anchor.point, UIParent, self.config.anchor.relativePoint, offsetX, offsetY
 end
 
 function TotemDismissConfigHelper:GetInitialButtonPoint()

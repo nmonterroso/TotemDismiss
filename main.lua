@@ -164,10 +164,39 @@ function TotemDismiss:enable(id)
   end
 end
 
-function TotemDismiss:unlock()
+function TotemDismiss:Unlock()
   if self.container == nil then
     return
   end
+
+  self.container:SetMovable(true)
+  self.container:EnableMouse(true)
+  self.container:RegisterForDrag("LeftButton")
+  self.container.dragTexture:Show()
+
+  self.container:SetScript("OnDragStart", function()
+    print("left: "..self.container:GetLeft().." bottom: "..self.container:GetBottom())
+    self.container:StartMoving()
+  end)
+  self.container:SetScript("OnDragStop", function()
+    print("left: "..self.container:GetLeft().." bottom: "..self.container:GetBottom())
+    self.config.anchor.offsetX = self.container:GetLeft()
+    self.config.anchor.offsetY = self.container:GetBottom()
+    self.config.anchor.point = "BOTTOMLEFT"
+    self.config.anchor.relativePoint = "BOTTOMLEFT"
+    self.container:StopMovingOrSizing()
+  end)
+end
+
+function TotemDismiss:Lock()
+  if self.container == nil then
+    return
+  end
+
+  self.container.dragTexture:Hide()
+  self.container:SetMovable(false)
+  self.container:EnableMouse(false)
+  self.container:RegisterForDrag("LeftButton")
 end
 
 function TotemDismiss:createContainer()
@@ -177,14 +206,20 @@ function TotemDismiss:createContainer()
   end
 
   container:SetFrameStrata("MEDIUM")
-  container:SetMovable(true)
-  container:EnableMouse(false)
-  container:RegisterForDrag("LeftButton")
   container:SetClampedToScreen(true)
   container:SetPoint(self.configHelper:GetContainerPoint())
   container:SetHeight(self.configHelper:GetHeight())
   container:SetWidth(self.configHelper:GetTotalWidth())
   container:Show()
+
+  if container.dragTexture == nil then
+    local dragTexture = container:CreateTexture()
+    dragTexture:SetColorTexture(0, .8, 0, .55)
+    dragTexture:SetAllPoints()
+    dragTexture:Hide()
+
+    container.dragTexture = dragTexture
+  end
 
   return container
 end
@@ -204,6 +239,7 @@ function TotemDismiss:createButton(id, type, anchor)
     button:SetPoint(self.configHelper:GetButtonPoint(anchor))
   end
 
+  button:SetFrameStrata("LOW")
   button:SetWidth(self.configHelper:GetWidth())
   button:SetHeight(self.configHelper:GetHeight())
   button:SetAttribute("*type1", "destroytotem")
