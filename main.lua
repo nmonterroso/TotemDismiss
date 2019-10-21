@@ -153,7 +153,6 @@ end
 function TotemDismiss:disable(id)
   local totem = self:getTotem(id)
   if totem.isReady then
-    totem.button:Disable()
     totem.overlay:Show()
     totem.cooldown:Clear()
   end
@@ -162,7 +161,6 @@ end
 function TotemDismiss:enable(id)
   local totem = self:getTotem(id)
   if totem.isReady then
-    totem.button:Enable()
     totem.overlay:Hide()
   end
 end
@@ -178,11 +176,9 @@ function TotemDismiss:Unlock()
   self.container.dragTexture:Show()
 
   self.container:SetScript("OnDragStart", function()
-    print("left: "..self.container:GetLeft().." bottom: "..self.container:GetBottom())
     self.container:StartMoving()
   end)
   self.container:SetScript("OnDragStop", function()
-    print("left: "..self.container:GetLeft().." bottom: "..self.container:GetBottom())
     self.config.anchor.offsetX = self.container:GetLeft()
     self.config.anchor.offsetY = self.container:GetBottom()
     self.config.anchor.point = "BOTTOMLEFT"
@@ -208,7 +204,6 @@ function TotemDismiss:createContainer()
     container = CreateFrame("Frame", nil, mainFrame)
   end
 
-  container:SetFrameStrata("MEDIUM")
   container:SetClampedToScreen(true)
   container:SetPoint(self.configHelper:GetContainerPoint())
   container:SetHeight(self.configHelper:GetHeight())
@@ -233,7 +228,7 @@ function TotemDismiss:createButton(id, type, anchor)
   if totem.isReady then
     button = totem.button
   else
-    button = CreateFrame("Button", "TotemDismissButton_"..type, UIParent, "SecureActionButtonTemplate")
+    button = CreateFrame("Button", "TotemDismissButton_"..type, self.container, "SecureActionButtonTemplate")
   end
 
   if anchor == nil then
@@ -245,7 +240,7 @@ function TotemDismiss:createButton(id, type, anchor)
   button:SetFrameStrata("LOW")
   button:SetWidth(self.configHelper:GetWidth())
   button:SetHeight(self.configHelper:GetHeight())
-  button:SetAttribute("*type1", "destroytotem")
+  button:SetAttribute("type1", "destroytotem")
   button:SetAttribute("*totem-slot*", id)
 
   return button
