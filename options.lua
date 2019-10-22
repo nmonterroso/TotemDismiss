@@ -85,9 +85,7 @@ local options = {
             monochrome = "Monochrome",
           },
           set = function(info, key, val)
-            --print(TotemDismiss:serializeTable(TotemDismiss.config.font.flags))
             TotemDismiss.config.font.flags[key] = val
-            --print(TotemDismiss:serializeTable(TotemDismiss.config.font.flags))
             TotemDismiss:Draw()
           end,
           get = function(info, key)

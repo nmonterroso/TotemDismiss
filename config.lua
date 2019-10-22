@@ -1,5 +1,4 @@
 local media = LibStub("LibSharedMedia-3.0")
-local fonts = media:HashTable("font")
 TotemDismissDefaultVariables = {
   global = {
     buttonWidth = 32,
