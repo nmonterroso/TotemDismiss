@@ -1,3 +1,4 @@
+local fonts = LibStub("LibSharedMedia-3.0"):HashTable("font")
 local options = {
   name = 'TotemDismiss',
   type = "group",
@@ -33,7 +34,49 @@ local options = {
         TotemDismiss:Draw()
       end,
       get = function(info) return TotemDismiss.config.scale end
-    }
+    },
+    font = {
+      name = "Font Options",
+      type = "group",
+      args = {
+        face = {
+          type = "select",
+          dialogControl = "LSM30_Font",
+          name = "Font Face",
+          desc = "Sets the font of the cooldown timer when a totem is active",
+          values = LibStub("LibSharedMedia-3.0"):HashTable("font"),
+          set = function(info, val)
+            TotemDismiss.config.font.name = val
+            TotemDismiss.config.font.path = fonts[val]
+            TotemDismiss:Draw()
+          end,
+          get = function(info)
+            return TotemDismiss.config.font.name
+          end,
+        },
+        size = {
+          name = "Font Size",
+          desc = "Size of the cooldown timer when a totem is active",
+          type = "range",
+          softMin = 1,
+          softMax = 32,
+          step = 1,
+          set = function(info, val)
+            if val < 1 then
+              val = 1
+            elseif val > 32 then
+              val = 32
+            end
+
+            TotemDismiss.config.font.size = val
+            TotemDismiss:Draw()
+          end,
+          get = function(info)
+            return TotemDismiss.config.font.size
+          end,
+        },
+      },
+    },
   }
 }
 

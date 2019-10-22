@@ -1,3 +1,5 @@
+local media = LibStub("LibSharedMedia-3.0")
+local fonts = media:HashTable("font")
 TotemDismissDefaultVariables = {
   global = {
     buttonWidth = 32,
@@ -6,7 +8,8 @@ TotemDismissDefaultVariables = {
     scale = 1.0,
     margin = 0,
     font = {
-      face = "Fonts\\FRIZQT__.TTF",
+      name = "Friz Quadrata TT",
+      path = "Fonts\\FRIZQT__.TTF",
       size = 16,
     },
     anchor = {
