@@ -11,6 +11,11 @@ TotemDismissDefaultVariables = {
       name = "Friz Quadrata TT",
       path = "Fonts\\FRIZQT__.TTF",
       size = 16,
+      flags = {
+        outline = false,
+        thickoutline = false,
+        monochrome = false,
+      },
     },
     anchor = {
       point = "LEFT",
@@ -62,4 +67,23 @@ end
 
 function TotemDismissConfigHelper:GetTotalWidth()
   return self:GetWidth()*4 + self.config.margin*3
+end
+
+function TotemDismissConfigHelper:GetFontFlags()
+  local flags = {}
+  if self.config.font.flags.outline then
+    table.insert(flags, "OUTLINE")
+  end
+  if self.config.font.flags.thickoutline then
+    table.insert(flags, "THICKOUTLINE")
+  end
+  if self.config.font.flags.monochrome then
+    table.insert(flags, "MONOCHROME")
+  end
+
+  if table.getn(flags) == 0 then
+    return nil
+  end
+
+  return table.concat(flags, ", ")
 end

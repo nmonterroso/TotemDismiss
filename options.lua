@@ -75,6 +75,25 @@ local options = {
             return TotemDismiss.config.font.size
           end,
         },
+        flags = {
+          name = "Other",
+          desc = "other modifications to the cooldown font",
+          type = "multiselect",
+          values = {
+            outline = "Outline",
+            thickoutline = "Thick Outline",
+            monochrome = "Monochrome",
+          },
+          set = function(info, key, val)
+            --print(TotemDismiss:serializeTable(TotemDismiss.config.font.flags))
+            TotemDismiss.config.font.flags[key] = val
+            --print(TotemDismiss:serializeTable(TotemDismiss.config.font.flags))
+            TotemDismiss:Draw()
+          end,
+          get = function(info, key)
+            return TotemDismiss.config.font.flags[key]
+          end,
+        },
       },
     },
   }
