@@ -5,6 +5,10 @@ TotemDismissDefaultVariables = {
     locked = true,
     scale = 1.0,
     margin = 0,
+    font = {
+      face = "Fonts\\FRIZQT__.TTF",
+      size = 16,
+    },
     anchor = {
       point = "LEFT",
       relativePoint = "CENTER",

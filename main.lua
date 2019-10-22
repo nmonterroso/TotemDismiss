@@ -257,6 +257,8 @@ function TotemDismiss:createCooldown(id, button)
   cooldown:SetDrawEdge(false)
   cooldown:SetPoint("TOPLEFT", 1, -1)
   cooldown:SetPoint("BOTTOMRIGHT", -1, 1)
+  cooldown.text = cooldown:GetRegions()
+  cooldown.text:SetFont(self.config.font.face, self.config.font.size)
 
   return cooldown
 end
