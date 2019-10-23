@@ -102,7 +102,6 @@ function TotemDismiss:InitTotem(totem, anchor)
   totem.button = self:CreateButton(totem, anchor)
 
   if self:IsShowingTotem(totem) then
-    self:Print("showing button "..totem.id)
     totem.button:Show()
   end
 

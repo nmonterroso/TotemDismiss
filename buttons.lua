@@ -10,10 +10,8 @@ function TotemDismiss:CreateButton(totem, anchor)
   end
 
   if anchor == nil then
-    self:Print("anchoring to container")
     button:SetPoint(self:GetInitialButtonPoint())
   else
-    self:Print("anchoring to prev button")
     button:SetPoint(self:GetButtonPoint(anchor))
   end
 

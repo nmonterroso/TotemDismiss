@@ -23,7 +23,7 @@ TotemDismiss.defaultVariables = {
     },
     displayTotems = {
       dismissAll = true,
-      normal = true,
+      regular = true,
     },
     totemOrder = {
       TotemDismiss.dismissAllTotem,
@@ -66,8 +66,20 @@ function TotemDismiss:GetButtonHeight()
 end
 
 function TotemDismiss:GetContainerWidth()
-  -- TODO: account for possibly not having the dismiss all totem
-  return self:GetButtonWidth()*5 + self.config.margin*4
+  if not self:IsShowingContainer() then
+    return 0
+  end
+
+  local numButtons = 0
+  if self.config.displayTotems.dismissAll then
+    numButtons = numButtons + 1
+  end
+
+  if self.config.displayTotems.regular then
+    numButtons = numButtons + 4
+  end
+
+  return self:GetButtonWidth()*numButtons + self.config.margin*(numButtons - 1)
 end
 
 function TotemDismiss:GetFontFlags()
@@ -89,10 +101,14 @@ function TotemDismiss:GetFontFlags()
   return table.concat(flags, ", ")
 end
 
+function TotemDismiss:IsShowingContainer()
+  return self.config.displayTotems.dismissAll or self.config.displayTotems.regular
+end
+
 function TotemDismiss:IsShowingTotem(totem)
   if totem.id == self.dismissAllTotem then
     return self.config.displayTotems.dismissAll
   end
 
-  return self.config.displayTotems.normal
+  return self.config.displayTotems.regular
 end
