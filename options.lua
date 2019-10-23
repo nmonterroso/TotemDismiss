@@ -36,7 +36,7 @@ local options = {
       get = function(info) return TotemDismiss.config.scale end
     },
     font = {
-      name = "Font Options",
+      name = "Font",
       type = "group",
       args = {
         face = {
@@ -94,6 +94,37 @@ local options = {
         },
       },
     },
+    advanced = {
+      name = "Advanced",
+      type = "group",
+      order = -1,
+      args = {
+        showDismissAll = {
+          name = "Show Dismiss All",
+          type = "toggle",
+          desc = "Whether or not to show button to dismiss all totems",
+          set = function(info, val)
+            TotemDismiss.config.displayTotems.dismissAll = val
+            TotemDismiss:Draw()
+          end,
+          get = function(info)
+            return TotemDismiss.config.displayTotems.dismissAll
+          end,
+        },
+        showRegular = {
+          name = "Show Regular",
+          type = "toggle",
+          desc = "Whether or not to show buttons to dismiss regular totems",
+          set = function(info, val)
+            TotemDismiss.config.displayTotems.regular = val
+            TotemDismiss:Draw()
+          end,
+          get = function(info)
+            return TotemDismiss.config.displayTotems.regular
+          end,
+        },
+      },
+    }
   }
 }
 

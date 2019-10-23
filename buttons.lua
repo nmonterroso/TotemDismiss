@@ -9,10 +9,16 @@ function TotemDismiss:CreateButton(totem, anchor)
     button = self:CreateRegularTotemButton(totem)
   end
 
-  if anchor == nil then
-    button:SetPoint(self:GetInitialButtonPoint())
+  if self:IsShowingTotem(totem) then
+    if anchor == nil then
+      button:SetPoint(self:GetInitialButtonPoint())
+    else
+      button:SetPoint(self:GetButtonPoint(anchor))
+    end
+
+    button:Show()
   else
-    button:SetPoint(self:GetButtonPoint(anchor))
+    button:Hide()
   end
 
   button:SetFrameStrata("LOW")

@@ -92,21 +92,22 @@ function TotemDismiss:CreateTotems()
   for _, id in ipairs(self.config.totemOrder) do
     local totem = self.totems[id]
 
-    self:InitTotem(totem, lastAnchor)
+    lastAnchor = self:InitTotem(totem, lastAnchor)
     self:OnTotemUpdate(totem.id)
-    lastAnchor = totem.button
   end
 end
 
 function TotemDismiss:InitTotem(totem, anchor)
   totem.button = self:CreateButton(totem, anchor)
 
-  if self:IsShowingTotem(totem) then
-    totem.button:Show()
-  end
-
   self:SetButtonTexture(totem)
   self:DisableButton(totem)
+
+  if self:IsShowingTotem(totem) then
+    return totem.button
+  end
+
+  return nil
 end
 
 function TotemDismiss:PlayerIsShaman()
