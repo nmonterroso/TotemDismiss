@@ -7,5 +7,7 @@
 
 externals.xml
 main.lua
+buttons.lua
+container.lua
 config.lua
 options.lua

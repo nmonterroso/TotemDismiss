@@ -1,5 +1,4 @@
-local media = LibStub("LibSharedMedia-3.0")
-TotemDismissDefaultVariables = {
+TotemDismiss.defaultVariables = {
   global = {
     buttonWidth = 32,
     buttonHeight = 32,
@@ -22,19 +21,21 @@ TotemDismissDefaultVariables = {
       offsetX = nil,
       offsetY = nil,
     },
+    displayTotems = {
+      dismissAll = true,
+      normal = true,
+    },
+    totemOrder = {
+      TotemDismiss.dismissAllTotem,
+      TotemDismiss.earthTotem,
+      TotemDismiss.fireTotem,
+      TotemDismiss.waterTotem,
+      TotemDismiss.airTotem,
+    }
   }
 }
 
-TotemDismissConfigHelper = {
-  config = nil,
-}
-
-function TotemDismissConfigHelper:init(config)
-  self.config = config
-  return self
-end
-
-function TotemDismissConfigHelper:GetContainerPoint()
+function TotemDismiss:GetContainerPoint()
   local offsetX = -2*self.config.buttonWidth
   if self.config.anchor.offsetX ~= nil then
     offsetX = self.config.anchor.offsetX
@@ -48,27 +49,28 @@ function TotemDismissConfigHelper:GetContainerPoint()
   return self.config.anchor.point, UIParent, self.config.anchor.relativePoint, offsetX, offsetY
 end
 
-function TotemDismissConfigHelper:GetInitialButtonPoint()
-  return "LEFT", TotemDismiss.container, "LEFT"
+function TotemDismiss:GetInitialButtonPoint()
+  return "LEFT", self.container, "LEFT"
 end
 
-function TotemDismissConfigHelper:GetButtonPoint(anchor)
+function TotemDismiss:GetButtonPoint(anchor)
   return "LEFT", anchor, "RIGHT", self.config.margin
 end
 
-function TotemDismissConfigHelper:GetHeight()
-  return self.config.buttonHeight*self.config.scale
-end
-
-function TotemDismissConfigHelper:GetWidth()
+function TotemDismiss:GetButtonWidth()
   return self.config.buttonWidth*self.config.scale
 end
 
-function TotemDismissConfigHelper:GetTotalWidth()
-  return self:GetWidth()*4 + self.config.margin*3
+function TotemDismiss:GetButtonHeight()
+  return self.config.buttonHeight*self.config.scale
 end
 
-function TotemDismissConfigHelper:GetFontFlags()
+function TotemDismiss:GetContainerWidth()
+  -- TODO: account for possibly not having the dismiss all totem
+  return self:GetButtonWidth()*5 + self.config.margin*4
+end
+
+function TotemDismiss:GetFontFlags()
   local flags = {}
   if self.config.font.flags.outline then
     table.insert(flags, "OUTLINE")
@@ -85,4 +87,12 @@ function TotemDismissConfigHelper:GetFontFlags()
   end
 
   return table.concat(flags, ", ")
+end
+
+function TotemDismiss:IsShowingTotem(totem)
+  if totem.id == self.dismissAllTotem then
+    return self.config.displayTotems.dismissAll
+  end
+
+  return self.config.displayTotems.normal
 end

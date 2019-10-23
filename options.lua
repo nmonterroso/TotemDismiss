@@ -10,9 +10,9 @@ local options = {
       set = function(info, val)
         TotemDismiss.config.locked = val
         if val then
-          TotemDismiss:Lock()
+          TotemDismiss:LockContainer()
         else
-          TotemDismiss:Unlock()
+          TotemDismiss:UnlockContainer()
         end
       end,
       get = function(info) return TotemDismiss.config.locked end
