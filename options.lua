@@ -1,4 +1,6 @@
 local fonts = LibStub("LibSharedMedia-3.0"):HashTable("font")
+local macroName = 'TotemDismissAll'
+local macroAction = '/click TotemDismissButton_dismissAll'
 local options = {
   name = 'TotemDismiss',
   type = "group",
@@ -128,14 +130,46 @@ local options = {
             return TotemDismiss.config.displayTotems.regular
           end,
         },
+        createMacroHeader = {
+          name = "Macro-based dismiss",
+          type = "header",
+          order = -3,
+        },
+        createMacroDesc = {
+          name = "It's possible to create a macro to dismiss all totems. This is recommended if hiding both the dismiss all button and the regular totem buttons. The macro for this is '"..macroAction.."'. Click the button below to have the character specific macro created with the name '"..macroName.."'",
+          type = "description",
+          order = -2,
+        },
+        createMacro = {
+          name = "Create Macro",
+          type = "execute",
+          order = -1,
+          func = function()
+            TotemDismiss:CreateMacro()
+          end
+        }
       },
     }
   }
 }
 
-TotemDismissOptions = {}
-function TotemDismissOptions:setup()
+function TotemDismiss:SetupOptions()
   LibStub("AceConfig-3.0"):RegisterOptionsTable("TotemDismiss", options, {"totemdismiss"})
   local optionFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("TotemDismiss", "Totem Dismiss")
   return optionFrame
+end
+
+function TotemDismiss:CreateMacro()
+  if UnitAffectingCombat("player") then
+    self:Print("Can't create macro when in combat")
+    return
+  end
+
+  local name = GetMacroInfo(macroName)
+  if name ~= nil then
+    DeleteMacro(macroName)
+  end
+
+  CreateMacro(macroName, 'Spell_Totem_WardOfDraining', macroAction, 1, 1)
+  self:Print("Macro created! Make sure to add it to your action bar")
 end

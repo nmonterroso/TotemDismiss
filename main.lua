@@ -16,7 +16,7 @@ function TotemDismiss:OnInitialize()
   end
 
   self.db = LibStub("AceDB-3.0"):New("TotemDismissDB", self.defaultVariables)
-  self.optionFrame = TotemDismissOptions:setup()
+  self.optionFrame = self:SetupOptions()
   self.config = nil
   self.container = nil
   self.totems = {
