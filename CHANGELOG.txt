@@ -1,0 +1,10 @@
+2019.10.23:
+- Adds dismiss all. This is enabled by default as a button that shows up before the regular totem buttons. Can be moved after the regular totem buttons, or hidden
+- Adds option to hide regular totem buttons
+- Info in Advanced options about creating a macro to dismiss all totems (requires this addon), as well as a button that will create a character-specific macro for you to dismiss your totems.
+
+2019.10.22:
+- First release!
+- lock/unlock
+- scale
+- cooldown font options
