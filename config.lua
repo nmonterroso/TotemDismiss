@@ -22,16 +22,9 @@ TotemDismiss.defaultVariables = {
       offsetY = nil,
     },
     displayTotems = {
-      dismissAll = true,
+      dismissAll = TotemDismiss.dismissAllOrdering.before,
       regular = true,
     },
-    totemOrder = {
-      TotemDismiss.dismissAllTotem,
-      TotemDismiss.earthTotem,
-      TotemDismiss.fireTotem,
-      TotemDismiss.waterTotem,
-      TotemDismiss.airTotem,
-    }
   }
 }
 
@@ -71,7 +64,7 @@ function TotemDismiss:GetContainerWidth()
   end
 
   local numButtons = 0
-  if self.config.displayTotems.dismissAll then
+  if self.config.displayTotems.dismissAll ~= 'never' then
     numButtons = numButtons + 1
   end
 
@@ -102,13 +95,32 @@ function TotemDismiss:GetFontFlags()
 end
 
 function TotemDismiss:IsShowingContainer()
-  return self.config.displayTotems.dismissAll or self.config.displayTotems.regular
+  return self.config.displayTotems.dismissAll ~= self.dismissAllOrdering.never or
+      self.config.displayTotems.regular
 end
 
 function TotemDismiss:IsShowingTotem(totem)
   if totem.id == self.dismissAllTotem then
-    return self.config.displayTotems.dismissAll
+    return self.config.displayTotems.dismissAll ~= self.dismissAllOrdering.never
   end
 
   return self.config.displayTotems.regular
+end
+
+function TotemDismiss:GetTotemOrder()
+  local order = {}
+  if self.config.displayTotems.dismissAll ~= self.dismissAllOrdering.after then
+    table.insert(order, TotemDismiss.dismissAllTotem)
+  end
+
+  table.insert(order, TotemDismiss.earthTotem)
+  table.insert(order, TotemDismiss.fireTotem)
+  table.insert(order, TotemDismiss.waterTotem)
+  table.insert(order, TotemDismiss.airTotem)
+
+  if self.config.displayTotems.dismissAll == self.dismissAllOrdering.after then
+    table.insert(order, TotemDismiss.dismissAllTotem)
+  end
+
+  return order
 end

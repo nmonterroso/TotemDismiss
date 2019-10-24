@@ -4,6 +4,11 @@ TotemDismiss.fireTotem = 1
 TotemDismiss.earthTotem = 2
 TotemDismiss.waterTotem = 3
 TotemDismiss.airTotem = 4
+TotemDismiss.dismissAllOrdering = {
+  never = 'never',
+  before = 'before',
+  after = 'after',
+}
 
 function TotemDismiss:OnInitialize()
   if not self:PlayerIsShaman() then
@@ -89,7 +94,7 @@ end
 
 function TotemDismiss:CreateTotems()
   local lastAnchor
-  for _, id in ipairs(self.config.totemOrder) do
+  for _, id in ipairs(self:GetTotemOrder()) do
     local totem = self.totems[id]
 
     lastAnchor = self:InitTotem(totem, lastAnchor)

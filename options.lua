@@ -100,9 +100,14 @@ local options = {
       order = -1,
       args = {
         showDismissAll = {
-          name = "Show Dismiss All",
-          type = "toggle",
+          name = "Show Dismiss All Button",
+          type = "select",
           desc = "Whether or not to show button to dismiss all totems",
+          values = {
+            [TotemDismiss.dismissAllOrdering.never] = 'Never',
+            [TotemDismiss.dismissAllOrdering.before] = 'Before Regular Totems',
+            [TotemDismiss.dismissAllOrdering.after] = 'After Regular Totems',
+          },
           set = function(info, val)
             TotemDismiss.config.displayTotems.dismissAll = val
             TotemDismiss:Draw()
